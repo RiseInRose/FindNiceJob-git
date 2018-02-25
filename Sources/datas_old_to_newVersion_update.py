@@ -71,5 +71,53 @@ def old_to_new():
         except:
             pass
     print(count)
+
+def old_to_news(job_name):
+    import pymongo
+    client = pymongo.MongoClient('localhost', 27017)
+    NiceJob = client.NiceJob
+    i = NiceJob.collection_names()
+    now_time0 = time.asctime(time.localtime(time.time()))
+    # now_time = int(now_time0.split(' ')[4].split(':')[1])%2
+    JobDetail = NiceJob.JobDetail
+
+    count = 0
+    for chart_name in i:
+        # print(str(chart_name).split('_')[0])
+        try:
+            chart_name_0 = str(chart_name).split('_')[0]
+            if chart_name_0 == str(job_name):
+                chart_name = NiceJob[chart_name]
+                datas = chart_name.find()
+                for each in datas:
+                    count +=1
+                    try:
+                        update_time = each['update_time']
+                    except:
+                        update_time = '01-22'
+                    # print(each)
+                    data = {
+                        'address': each['address'],
+                        'location': each['location'],
+                        'job': each['job'],
+                        'job_url': each['job_url'],
+                        'experience': each['experience'],
+                        'job_requirements': each['job_requirements'],
+                        'job_category': each['job_category'],
+                        'company': each['company'],
+                        'company_url': each['company_url'],
+                        'area': each['area'],
+                        'pay_frist': each['pay_frist'],
+                        'pay_last': each['pay_last'],
+                        'pub_time_frist': each['pub_time_frist'],
+                        'pub_time_last': each['pub_time_last'],
+                        'job_status': each['job_status'],
+                        'update_time':update_time,
+                        'chart_name':chart_name_0
+                    }
+                    JobDetail.update({'chart_name': chart_name_0,'job_url':each['job_url']}, {'$set': data}, True)
+        except:
+            pass
+    print(count)
 if __name__ == '__main__':
     old_to_new()
